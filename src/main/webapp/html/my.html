@@ -1,11 +1,92 @@
-<html>
+<!doctype html>
+<html lang="ru">
 <head>
-    <title>RPG</title>
-    <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
-    <link href="/css/my.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RPG</title>
+  <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+  <link href="/css/my.css" rel="stylesheet">
 </head>
 <body>
-<h1>RPG admin panel</h1>
+  <h1>RPG admin panel</h1>
+
+  <div>
+    <h2 class="table-caption">Accounts list:</h2>
+    <div id="dropdown-container"></div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Title</th>
+          <th>Race</th>
+          <th>Profession</th>
+          <th>Level</th>
+          <th>Birthday</th>
+          <th>Banned</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+      $.ajax({
+          url: "/rest/players",
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+              let tableBody = $('.table tbody');
+              $.each(data, function(index, item) {
+                  let row = $('<tr>');
+                  row.append($('<td>').text(item.id));
+                  row.append($('<td>').text(item.name));
+                  row.append($('<td>').text(item.title));
+                  row.append($('<td>').text(item.race));
+                  row.append($('<td>').text(item.profession));
+                  row.append($('<td>').text(item.level));
+                  let birthday = new Date(item.birthday).toLocaleDateString('en-GB');
+                  row.append($('<td>').text(birthday));
+                  row.append($('<td>').text(item.banned));
+                  tableBody.append(row);
+              });
+          },
+          error: function(xhr, status, error) {
+              console.error('Ошибка при получении данных:', error);
+          }
+      });
+
+      $(document).ready(function () {
+          $('#dropdown-container').append(
+              $(document.createElement('label')).prop({
+                for: 'countPerPage'
+              }).html('Count per page:')
+          )
+          .append(
+              $(document.createElement('select')).prop({
+                  id: 'countPerPage',
+                  name: 'countPerPage'
+              })
+          )
+
+          for (let i = 3; i <= 20; i++) {
+              $('#countPerPage').append($(document.createElement('option')).prop({
+                  value: i,
+                  text: i
+              }))
+          }
+      });
+
+      const playersCount =  $.ajax({
+          url: "/rest/players/count",
+          method: 'GET',
+          dataType: 'text'
+      });
+
+
+  </script>
 
 </body>
 </html>
